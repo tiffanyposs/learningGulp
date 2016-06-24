@@ -149,3 +149,95 @@ $ node server.js
 
 Now you can view the website on `localhost:3000`
 
+
+
+###Watch
+
+You can watch files in Gulp to see if they change.
+
+First we are going to create a variable to hold our pathname since we are reusing it. This will target any js files within scripts or any sub folders of scripts.
+
+```
+var SCRIPTS_PATH = 'public/scripts/**/*.js';
+
+```
+
+Consider the watch task below, naming it watch is convention so stick to it. First we *require* the server file we write, this will automatically boot up our server when we start watching our project. Then we add a `gulp.watch` method. We first pass it the files we want it to watch, secondly we pass it an array gulp task to run.
+
+Below we are booting up the server then watching all the files within the `public/scripts` folder (and sub folders). Whenever they are modified, the *scripts* gulp task will run auto updating the minified js files. 
+
+```
+gulp.task('watch', function() {
+	console.log('Starting Watch Task');
+	require('./server.js');
+	gulp.watch(SCRIPTS_PATH, ['scripts']);
+});
+
+```
+
+To start the watch (and the server):
+
+```
+$ gulp watch
+
+```
+
+
+###Live Reload
+
+Live reload will auto refresh your webpage. When you add it to the watch task within Gulp it's really powerful
+
+To install the node_module:
+
+
+```
+$ npm install gulp-livereload@3.8.1 --save-dev
+
+```
+
+Then in you gulpfile, you have to require the module:
+
+```
+var livereload = require('gulp-livereload');
+
+```
+
+Once you've required it, you need to add the `livereload.listen` method after the server starts but before the watch starts.
+
+```
+gulp.task('watch', function() {
+	console.log('Starting Watch Task');
+	require('./server.js');
+	livereload.listen();
+	gulp.watch(SCRIPTS_PATH, ['scripts']);
+});
+
+```
+
+Next, you need to add it to the individual tasks. See below how it's added as a `pipe`, and we pass in the livereload function call.
+
+```
+gulp.task('scripts', function() {
+	console.log('starting scripts task');
+
+	return gulp.src(SCRIPTS_PATH)
+		.pipe(uglify())
+		.pipe(gulp.dest('public/dist'))
+		.pipe(livereload());
+		
+});
+
+```
+
+
+Lastly you need to do one of two things. You need to download a livereload plugin on chorme that will be the client for the live reload, or you can add the following script tag to you *.html* file(s)
+
+```
+  <script src="http://localhost:35729/livereload.js"></script>
+
+```
+
+
+Now you can reboot the watch task in terminal. Now every time you save a script file the browser will automatically refresh.
+
+Now 
