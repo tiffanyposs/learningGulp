@@ -240,4 +240,89 @@ Lastly you need to do one of two things. You need to download a livereload plugi
 
 Now you can reboot the watch task in terminal. Now every time you save a script file the browser will automatically refresh.
 
-Now 
+
+###Gulp-Concat
+
+This plugin will concatinate all of you css files into one.
+
+Install your plugin:
+
+```
+$ npm install gulp-contat@2.6.0 --save-dev
+
+```
+
+Require it in you `gulpfile.js`:
+
+```
+var concat = require('gulp-concat');
+
+```
+
+
+Now you can create some css files within a new folder `css` within the `public` folder. Like the Scripts task, you can add similar logic for the CSS files.
+
+* Create CSS variable for paths
+* Return the content from those css files
+* *concat* them into a file named `styles.css`
+* put them into the `./public/dist` folder
+* reload the page
+
+
+```
+var DIST_PATH = 'public/dist';
+var CSS_PATH = 'public/css/**/*.css';
+
+// Styles
+gulp.task('styles', function() {
+  console.log('starting styles task');
+
+  return gulp.src(CSS_PATH)
+  		.pipe(concat('styles.css'))
+  		.pipe(gulp.dest(DIST_PATH))
+  		.pipe(livereload());
+});
+
+```
+
+Now you can run:
+
+```
+$ gulp styles
+
+```
+
+Now you will see that gulp made one css file for you, but what if you want to control the order of the css files within the one main one. You can pass an array of filenames to the `.src` method that will put them in the order you pass. Below it will load the `reset.css` file first, then will load everything else (excluding `reset.css`)
+
+```
+
+var DIST_PATH = 'public/dist';
+var SCRIPTS_PATH = 'public/scripts/**/*.js';
+var CSS_PATH = 'public/css/**/*.css';
+
+gulp.task('styles', function() {
+  console.log('starting styles task');
+
+  return gulp.src(['public/css/reset.css', CSS_PATH])
+  		.pipe(concat('styles.css'))
+  		.pipe(gulp.dest(DIST_PATH))
+  		.pipe(livereload());
+});
+
+```
+
+Now  you can just add the one css file to your `index.html`
+
+```
+  <link rel="stylesheet" href="./dist/styles.css">
+
+```
+
+
+###Gulp-Minify-Css
+
+
+```
+$ npm install gulp-minify-css@1.2.2 --save-dev
+
+```
