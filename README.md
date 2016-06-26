@@ -321,8 +321,39 @@ Now  you can just add the one css file to your `index.html`
 
 ###Gulp-Minify-Css
 
+This plugin will minify your css:
 
 ```
 $ npm install gulp-minify-css@1.2.2 --save-dev
 
 ```
+
+You can implement it simply by calling `minifyCss()` in a pipe
+
+```
+var minifyCss = require('gulp-minify-css');
+
+// Styles
+gulp.task('styles', function() {
+  console.log('starting styles task');
+
+  return gulp.src(['public/css/reset.css', CSS_PATH])
+  		.pipe(concat('styles.css'))
+  		.pipe(minifyCss())
+  		.pipe(gulp.dest(DIST_PATH))
+  		.pipe(livereload());
+});
+
+```
+
+###Adding Styles Watch
+
+Now to your watch task, you can add the css files to the mix by simply adding another folder to watch, and a task to run.
+
+```
+gulp.watch(CSS_PATH, ['styles']);
+
+```
+
+###Autoprefixer
+
