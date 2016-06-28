@@ -7,7 +7,15 @@ var autoprefixer = require('gulp-autoprefixer');
 var plumber = require('gulp-plumber');
 var sourcemaps = require('gulp-sourcemaps');
 
+//sass plugins
 var sass = require('gulp-sass');
+
+//less plugins
+var less = require('gulp-less');
+var LessAutoprefix = require('less-plugin-autoprefix');
+var lessAutoprefix = new LessAutoprefix({
+  browsers: ['last 2 versions']
+});
 
 // File Paths
 var DIST_PATH = 'public/dist';
@@ -35,7 +43,7 @@ gulp.task('styles', function() {
 
 // Styles With Sass
 gulp.task('sassStyles', function() {
-  console.log('starting styles task');
+  console.log('starting sass styles task');
 
   return gulp.src('public/scss/sassStyles.scss')
       .pipe(plumber( function(err) { 
@@ -53,6 +61,26 @@ gulp.task('sassStyles', function() {
       .pipe(livereload());
 });
 
+
+// Styles With Less
+gulp.task('lessStyles', function() {
+  console.log('starting less styles task');
+
+  return gulp.src('public/less/lessStyles.less')
+      .pipe(plumber( function(err) { 
+        console.log('Styles Task Error:');
+        console.log(err);
+        this.emit('end');
+      }))
+      .pipe(sourcemaps.init())
+      .pipe(less({
+        plugins: [lessAutoprefix]
+      }))
+      .pipe(minifyCss())
+      .pipe(sourcemaps.write())
+      .pipe(gulp.dest(DIST_PATH))
+      .pipe(livereload());
+});
 
 
 // Scripts
@@ -83,5 +111,6 @@ gulp.task('watch', function() {
 	livereload.listen();
 	gulp.watch(SCRIPTS_PATH, ['scripts']);
 	gulp.watch(CSS_PATH, ['styles']);
-  gulp.watch('public/scss/**/*.scss', ['sassStyles'])
+  gulp.watch('public/scss/**/*.scss', ['sassStyles']);
+  gulp.watch('public/less/**/*.less', ['lessStyles']);
 });

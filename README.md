@@ -570,3 +570,58 @@ gulp.watch('public/scss/**/*.scss', ['sassStyles'])
 ```
 
 Now sass and scss will compile an compress.
+
+
+
+###LESS
+
+To compile LESS, you need two plugins `gulp-less` and `less-plugin-autoprefix`. The autoprefixer we added before won't work with less, so we are replacing it with this new one.
+
+```
+$ npm install gulp-less@3.0.5 --save-dev
+$ npm install less-plugin-autoprefix@1.5.1 --save-dev
+
+```
+Then you must require the variables, and create a new instance of the autoprefix plugin. You can also pass in settings.
+
+```
+//less plugins
+var less = require('gulp-less');
+var LessAutoprefix = require('less-plugin-autoprefix');
+var lessAutoprefix = new LessAutoprefix({
+  browsers: ['last 2 versions']
+});
+
+```
+
+Then you can create a new task that looks at the less files. You can remove the old autoprefixer, and add a new pipe that passes in less, then passes in a plugin setting set to our less autoprefixer instance. We also keep minifiy in because it's not included like it is in Sass
+
+```
+// Styles With Less
+gulp.task('lessStyles', function() {
+  console.log('starting less styles task');
+
+  return gulp.src('public/less/lessStyles.less')
+      .pipe(plumber( function(err) { 
+        console.log('Styles Task Error:');
+        console.log(err);
+        this.emit('end');
+      }))
+      .pipe(sourcemaps.init())
+      .pipe(less({
+        plugins: [lessAutoprefix]
+      }))
+      .pipe(minifyCss())
+      .pipe(sourcemaps.write())
+      .pipe(gulp.dest(DIST_PATH))
+      .pipe(livereload());
+});
+
+```
+
+Then you can add it to the watch list.
+
+```
+gulp.watch('public/less/**/*.less', ['lessStyles']);
+
+```
