@@ -625,3 +625,27 @@ Then you can add it to the watch list.
 gulp.watch('public/less/**/*.less', ['lessStyles']);
 
 ```
+
+##JavaScript with Gulp
+
+To get started, we can use the same *plumber*, *concat*, and *sourcemaps*  plugins we used for css, just pass in a new script name *scripts.js* to concat. Don't forget to add it to your `index.html` file.
+
+```
+gulp.task('scripts', function() {
+	console.log('starting scripts task');
+	return gulp.src(SCRIPTS_PATH)
+    .pipe(plumber(function(err) {
+      console.log('Scripts task error');
+      console.log(err);
+      this.emit('end');
+    }))
+    .pipe(sourcemaps.init())
+		.pipe(uglify())
+    .pipe(concat('scripts.js'))
+    .pipe(sourcemaps.write())
+		.pipe(gulp.dest(DIST_PATH))
+		.pipe(livereload());
+});
+
+```
+
