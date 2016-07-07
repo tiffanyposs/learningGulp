@@ -628,6 +628,8 @@ gulp.watch('public/less/**/*.less', ['lessStyles']);
 
 ##JavaScript with Gulp
 
+###Basic Tasks
+
 To get started, we can use the same *plumber*, *concat*, and *sourcemaps*  plugins we used for css, just pass in a new script name *scripts.js* to concat. Don't forget to add it to your `index.html` file.
 
 ```
@@ -649,3 +651,133 @@ gulp.task('scripts', function() {
 
 ```
 
+###Babel
+
+Babel will allow you to convert scripts so that they are readable for all browswers.
+
+```
+$ npm install --save-dev gulp-babel babel-preset-es2015
+
+```
+
+Require the module
+
+```
+var babel = require('gulp-babel');
+
+```
+
+Now in your script file, add a pipe that calls the babel variable and sets presets to `es2015`. This will convert all of your ES2015 code into code that your browsers could read.
+
+
+```
+  .pipe(babel({
+    presets: ['es2015']
+  }))
+
+```
+
+This will be compiled in a way that browswers can read it
+
+```
+class Person {
+	constructor (name) {
+		this.name = name;
+	}
+	hello() {
+		if(typeof this.name === 'string') {
+			return 'Hello, I am ' + this.name + '!';
+		}else {
+			return 'Hello!';
+		}
+	}
+}
+var person = new Person('Karl');
+
+```
+
+###Handlebars
+
+There are a few modules we need to build our Handlebars functionality. 
+
+
+```
+$ npm install --save-dev gulp-wrap gulp-declare gulp-handlebars handlebars
+
+```
+Also you will need to make a `templates` folder with a `.hbs` file in it.
+
+```
+  <p>Starting</p>
+  <p>{{message}}</p>
+  <p>Stopping</p>
+
+```
+Require the modules
+
+```
+//handlebars plugins
+var handlebars = require('gulp-handlebars');
+var handlebarsLib = require('handlebars');
+var declare = require('gulp-declare');
+var wrap = require('gulp-wrap');
+
+```
+Create the task. You call handlebars and pass it the handlebars library. Wrap wraps the template as a string. Declare creates a variable with the namespace, then it saves it as a js file with concat. 
+
+```
+gulp.task('templates', function() {
+    return gulp.src(TEMPLATES_PATH)
+      .pipe(handlebars({
+        handlebars: handlebarsLib
+      }))
+      .pipe(wrap('Handlebars.template(<%= contents %>)'))
+      .pipe(declare({
+        namespace: 'templates',
+        noRedeclare: true
+      }))
+      .pipe(concat('templates.js'))
+      .pipe(gulp.dest(DIST_PATH))
+      .pipe(livereload());
+});
+
+```
+
+You can include that concatted script in your index.html along with the handlebars library
+
+```
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.js"></script>
+  <script src="/dist/templates.js"></script>
+  
+```
+Now you can access this variable in the browser
+
+```
+templates['greeting']({message: "Hello world"})
+
+```
+
+Which means you can also include it in you script file
+
+```
+class Person {
+	constructor (name) {
+		this.name = name;
+	}
+	hello() {
+		if(typeof this.name === 'string') {
+			return 'Hello, I am ' + this.name + '!';
+		}else {
+			return 'Hello!';
+		}
+	}
+}
+var person = new Person('Karl');
+var greetHTML = templates['greeting']({
+	message: person.hello()
+});
+
+
+document.write(greetHTML);
+
+```
