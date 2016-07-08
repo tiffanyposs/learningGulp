@@ -8,6 +8,7 @@ var plumber = require('gulp-plumber');
 var sourcemaps = require('gulp-sourcemaps');
 var babel = require('gulp-babel');
 var del = require('del');
+var zip = require('gulp-zip');
 
 //handlebars plugins
 var handlebars = require('gulp-handlebars');
@@ -151,8 +152,19 @@ gulp.task('templates', function() {
       .pipe(livereload());
 });
 
+gulp.task('clean', function() {
+   return del.sync([
+      DIST_PATH
+    ]);
+});
 
-gulp.task('default', ['images', 'templates', 'styles', 'scripts'] , function() {
+gulp.task('export', function() {
+  return gulp.src('public/**/*')
+      .pipe(zip('website.zip'))
+      .pipe(gulp.dest('./'))
+});
+
+gulp.task('default', ['clean', 'images', 'templates', 'styles', 'scripts'] , function() {
 	console.log('Starting Default Task');
 });
 

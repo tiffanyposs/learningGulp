@@ -230,7 +230,7 @@ gulp.task('scripts', function() {
 ```
 
 
-Lastly you need to do one of two things. You need to download a livereload plugin on chorme that will be the client for the live reload, or you can add the following script tag to you *.html* file(s)
+Lastly you need to do one of two things. You need to download a livereload plugin on chrome that will be the client for the live reload, or you can add the following script tag to you *.html* file(s)
 
 ```
   <script src="http://localhost:35729/livereload.js"></script>
@@ -243,7 +243,7 @@ Now you can reboot the watch task in terminal. Now every time you save a script 
 
 ###Gulp-Concat
 
-This plugin will concatinate all of you css files into one.
+This plugin will concatenate all of you css files into one.
 
 Install your plugin:
 
@@ -357,7 +357,7 @@ gulp.watch(CSS_PATH, ['styles']);
 
 ###Autoprefixer
 
-This will add all the browswer prefixes automatically to your css code.
+This will add all the browser prefixes automatically to your css code.
 
 ```
 $ npm install gulp-autoprefixer@3.1.0 --save-dev
@@ -371,7 +371,7 @@ var autoprefixer = require('gulp-autoprefixer');
 
 ```
 
-Now you can simply call the autoprefixer within your styles task before you concatinate it.
+Now you can simply call the autoprefixer within your styles task before you concatenate it.
 
 ```
 ...
@@ -386,7 +386,7 @@ Now you can simply call the autoprefixer within your styles task before you conc
 
 ```
 
-You can also add custom browswers if you're only supporting certain ones
+You can also add custom browsers if you're only supporting certain ones
 
 ```
 .pipe(autoprefixer({
@@ -594,7 +594,7 @@ var lessAutoprefix = new LessAutoprefix({
 
 ```
 
-Then you can create a new task that looks at the less files. You can remove the old autoprefixer, and add a new pipe that passes in less, then passes in a plugin setting set to our less autoprefixer instance. We also keep minifiy in because it's not included like it is in Sass
+Then you can create a new task that looks at the less files. You can remove the old autoprefixer, and add a new pipe that passes in less, then passes in a plugin setting set to our less autoprefixer instance. We also keep minify in because it's not included like it is in Sass
 
 ```
 // Styles With Less
@@ -653,7 +653,7 @@ gulp.task('scripts', function() {
 
 ###Babel
 
-Babel will allow you to convert scripts so that they are readable for all browswers.
+Babel will allow you to convert scripts so that they are readable for all browsers.
 
 ```
 $ npm install --save-dev gulp-babel babel-preset-es2015
@@ -677,7 +677,7 @@ Now in your script file, add a pipe that calls the babel variable and sets prese
 
 ```
 
-This will be compiled in a way that browswers can read it
+This will be compiled in a way that browsers can read it
 
 ```
 class Person {
@@ -743,7 +743,7 @@ gulp.task('templates', function() {
 
 ```
 
-You can include that concatted script in your index.html along with the handlebars library
+You can include that concatenated script in your index.html along with the handlebars library
 
 ```
   <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.js"></script>
@@ -831,7 +831,7 @@ var imageminPngquant = require('imagemin-pngquant');
 var imageminJpegRecompress = require('imagemin-jpeg-recompress');
 
 ```
-Create a path to the image files. Below we define the path with all the supported extentions for file types.
+Create a path to the image files. Below we define the path with all the supported extensions for file types.
 
 ```
 var IMAGES_PATH = 'public/images/**/*.{png,jpeg,jpg,svg,gif}';
@@ -903,3 +903,52 @@ Require it:
 var del = require('del');
 
 ```
+
+To use it, we can create a new task named `clean`, and from there you can add paths to an array you pass to the `del.sync` method. Here we want to wipe out the whole `DIST_PATH` folder.
+
+```
+gulp.task('clean', function() {
+   return del.sync([
+      DIST_PATH
+    ]);
+});
+
+```
+
+Now you can add the `clean` task as the first task in the `default` task array.
+
+```
+gulp.task('default', ['clean', 'images', 'templates', 'styles', 'scripts'] , function() {
+	console.log('Starting Default Task');
+});
+
+```
+
+###Zipping Files
+
+Load it.
+
+```
+$ npm install --save-dev gulp-zip
+
+```
+Require it.
+
+```
+var zip = require('gulp-zip');
+
+```
+
+Now we can create a new `export` task that will zip the project into a `website.zip` file in the root directory of our project.
+
+```
+gulp.task('export', function() {
+  return gulp.src('public/**/*')
+      .pipe(zip('website.zip'))
+      .pipe(gulp.dest('./'))
+});
+
+```
+
+
+###FIN
