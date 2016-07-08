@@ -781,3 +781,125 @@ var greetHTML = templates['greeting']({
 document.write(greetHTML);
 
 ```
+
+
+###Default Task
+
+For Default tasks, you can pass an array of tasks as the second argument, all of these tasks will run when you run just `gulp` in the console.
+
+```
+gulp.task('default', ['images', 'templates', 'styles', 'scripts'] , function() {
+	console.log('Starting Default Task');
+});
+
+```
+
+You can also do this within the watch task so when you start watch it changes any edits you already made. See below we add *default* to the 
+
+```
+gulp.task('watch', ['default'], function() {
+	console.log('Starting Watch Task');
+	require('./server.js');
+	livereload.listen();
+	gulp.watch(SCRIPTS_PATH, ['scripts']);
+	gulp.watch(CSS_PATH, ['styles']);
+    gulp.watch('public/scss/**/*.scss', ['sassStyles']);
+    gulp.watch('public/less/**/*.less', ['lessStyles']);
+    gulp.watch(TEMPLATES_PATH,  ['templates']);
+});
+
+```
+
+
+###Other Plugins
+
+####Compressing Images
+
+Lossless compresses but doesn't really reduce the file size that much, while Lossy reduces it a lot but may have sight reduced quality.
+
+```
+$ npm install --save-dev gulp-imagemin@3.0.1 imagemin-pngquant@5.0.0 imagemin-jpeg-recompress@5.0.0
+
+```
+Require the modules:
+
+
+```
+//image compression
+var imagemin = require('imagemin');
+var imageminPngquant = require('imagemin-pngquant');
+var imageminJpegRecompress = require('imagemin-jpeg-recompress');
+
+```
+Create a path to the image files. Below we define the path with all the supported extentions for file types.
+
+```
+var IMAGES_PATH = 'public/images/**/*.{png,jpeg,jpg,svg,gif}';
+
+```
+
+Lastly we update our images task to use `imagemin`
+
+```
+// Images
+gulp.task('images', function() {
+  return gulp.src(IMAGES_PATH)
+    .pipe(imagemin())
+    .pipe(gulp.dest(DIST_PATH  + '/images'))
+
+});
+
+```
+
+Now if you run `gulp images` in terminal, it will compress the images you have in your `IMAGES_PATH` folder and save them in the `DIST_PATH` folder. Once you run it you might see a message with information on how much space was saved
+
+```
+[20:13:21] gulp-imagemin: Minified 5 images (saved 288.53 kB - 7.8%)
+
+```
+
+To add lossy compression, we need to pass in our other plugins. Below we first include some default plugins (gifsicle, jpegtran, optipng, and svgo) that already come with imagemin, but since we are overriding some plugins we want to make sure we keep them. Then we call our lossy plugins.
+
+```
+// Images
+gulp.task('images', function() {
+  return gulp.src(IMAGES_PATH)
+    .pipe(imagemin(
+      [
+          imagemin.gifsicle(),
+          imagemin.jpegtran(),
+          imagemin.optipng(),
+          imagemin.svgo(),
+          imageminPngquant(),
+          imageminJpegRecompress()
+      ]
+      ))
+    .pipe(gulp.dest(DIST_PATH  + '/images'))
+
+});
+
+```
+
+
+Now you can run `gulp images` and you will see that it compresses a lot more. 10x more than the last time.
+
+```
+gulp-imagemin: Minified 5 images (saved 2.58 MB - 70.2%)
+
+```
+
+###Deleting Files
+
+This will auto delete files for you:
+
+```
+$ npm install --save-dev del
+
+```
+
+Require it:
+
+```
+var del = require('del');
+
+```
